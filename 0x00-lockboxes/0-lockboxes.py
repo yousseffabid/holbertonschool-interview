@@ -13,5 +13,4 @@ def canUnlockAll(boxes):
         if ((key < number_boxes) and (box_locked[key] is True)):
             box_locked[key] = False
             keys.extend(boxes[key])
-
     return not any(box_locked)
