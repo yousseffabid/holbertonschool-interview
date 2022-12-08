@@ -9,7 +9,6 @@ def canUnlockAll(boxes):
     number_boxes = len(boxes)
     keys = boxes[0]
     box_locked = [False] + [True] * (number_boxes - 1)
-
     for key in keys:
         if ((key < number_boxes) and (box_locked[key] is True)):
             box_locked[key] = False
