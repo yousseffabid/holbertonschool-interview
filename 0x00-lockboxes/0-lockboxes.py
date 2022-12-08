@@ -9,6 +9,7 @@ The first box boxes[0] is unlocked
 Return True if all boxes can be opened, else return False
 """
 def canUnlockAll(boxes):
+    """Unlock Boxes"""
     size = len(boxes)
     
     if not size or not len(boxes[0]):
