@@ -9,31 +9,14 @@ Return True if all boxes can be opened, else return False
 """
 
 
+
 def canUnlockAll(boxes):
-    """Unlock Boxes"""
-    size = len(boxes)
-    
-    if not size or not len(boxes[0]):
-        return False
-    
-    
-    keys = set(boxes[0])
-    
-    number_opened_boxes = 1
-    
-    for i in range(1, size):
-        if i not in keys:
-            return False
-
-        number_opened_boxes += 1
-        
-        size_sublist = len(boxes[i])
-        
-        if size_sublist:
-            sublist = boxes[i]
-            keys.add(tuple(sublist))
-
-        if number_opened_boxes == size:
-            return True
-
-    return False
+    """unlock boxes"""
+    number_boxes = len(boxes)
+    keys = boxes[0]
+    box_locked = [False] + [True] * (number_boxes - 1)
+    for key in keys:
+        if ((key < number_boxes) and (box_locked[key] is True)):
+            box_locked[key] = False
+            keys.extend(boxes[key])
+    return not any(box_locked)
