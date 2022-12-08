@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 """
 function that checks if all boxes can be unlocked
 A key with the same number as a box opens that box
@@ -8,6 +7,8 @@ There can be keys that do not have boxes
 The first box boxes[0] is unlocked
 Return True if all boxes can be opened, else return False
 """
+
+
 def canUnlockAll(boxes):
     """Unlock Boxes"""
     size = len(boxes)
@@ -30,13 +31,11 @@ def canUnlockAll(boxes):
         
         if size_sublist:
             sublist = boxes[i]
-            
-        for j in range(size_sublist):
-            if sublist[j] <= size - 1 and sublist[j] > 0:
-                keys.add(sublist[j])
+            keys.add(tuple(sublist))
 
         if number_opened_boxes == size:
             return True
 
     return False
 
+print(canUnlockAll([[1, 4], [2], [0, 4, 1], [3], [], [4, 1], [5, 6]]))
