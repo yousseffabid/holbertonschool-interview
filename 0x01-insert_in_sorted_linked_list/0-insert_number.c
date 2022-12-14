@@ -3,7 +3,7 @@
 #include "lists.h"
 
 /**
- * print_listint - prints all elements 
+ * print_listint - prints all elements
  * @h: pointer to head of list
  * Return: number of nodes
  */
