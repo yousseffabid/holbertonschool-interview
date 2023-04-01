@@ -1,1 +1,1 @@
-|# sorted_array_to_avl
+# sorted_array_to_avl

@@ -1,63 +1,64 @@
 #include "binary_trees.h"
-
 /**
- * new_node - Creates a new node
- * @parent: new_node's parent
- * @data: new_node's data
- * Return: new node
+ * sorted_array_to_avl - convert array to avl tree
+ * @array: array to convert.
+ * @size: size of array.
+ * Return: tree.
  */
-
-avl_t *new_node(avl_t *parent, int data)
-{
-    avl_t *new_node;
-
-    new_node = malloc(sizeof(avl_t));
-    if (!new_node)
-        return (NULL);
-    new_node->n = data;
-    new_node->parent = parent;
-    new_node->left = NULL;
-    new_node->right = NULL;
-
-    return (new_node);
-}
-
-/**
- * array_to_bts - builds a BTS from a sorted array
- * @array: source sorted array
- * @start: starting point
- * @end: end of the array
- * @parent_node: parent node
- * Return: avl_t root node
- */
-
-avl_t *array_to_bts(int *array, int start, int end, avl_t *parent_node)
-{
-    avl_t *root;
-
-    if (start > end)
-        return (NULL);
-
-    int middle = (start + end) / 2;
-
-    root = new_node(parent_node, array[middle]);
-
-    root->left = array_to_bts(array, start, middle - 1, root);
-    root->right = array_to_bts(array, middle + 1, end, root);
-
-    return (root);
-}
-
-/**
- * sorted_array_to_avl - builds a BTS from a sorted array
- * @array: source sorted array
- * @size: size of the source array
- * Return: avl_t root node
- */
-
 avl_t *sorted_array_to_avl(int *array, size_t size)
 {
-    if (!array)
+    avl_t *tree = NULL;
+
+    tree = recursive_tree(array, 0, (int)size - 1);
+    if (!tree)
         return (NULL);
-    return (array_to_bts(array, 0, size - 1, NULL));
+    return (tree);
+}
+/**
+ * create_node - create node of avl_t
+ * @n: number
+ * Return: node or NULL
+ */
+avl_t *create_node(int n)
+{
+    avl_t *node = NULL;
+
+    if (n == 0)
+        return (NULL);
+    node = malloc(sizeof(avl_t));
+    if (!node)
+        return (NULL);
+    node->parent = NULL;
+    node->left = NULL;
+    node->right = NULL;
+    node->n = n;
+    return (node);
+}
+/**
+ * recursive_tree - add node with recursive fuction
+ * @array: array.
+ * @ben: begin.
+ * @end: end.
+ * Return: tree
+ */
+avl_t *recursive_tree(int *array, int ben, int end)
+{
+    avl_t *left = NULL, *right = NULL, *parent = NULL;
+    size_t n = 0;
+
+    if (ben > end)
+        return (NULL);
+    n = (ben + end) / 2;
+    left = recursive_tree(array, ben, n - 1);
+    right = recursive_tree(array, n + 1, end);
+    parent = create_node(array[n]);
+    if (!parent)
+        return (NULL);
+    parent->left = left;
+    parent->right = right;
+    if (left)
+        left->parent = parent;
+    if (right)
+        right->parent = parent;
+    return (parent);
 }
