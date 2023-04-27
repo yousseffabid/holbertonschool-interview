@@ -12,4 +12,4 @@ void SiftDown(int *array, size_t size, int start, int end);
 void heap_sort(int *array, size_t size);
 
 
-#endif /* SORT_H */
+#endif
