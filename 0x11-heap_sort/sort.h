@@ -1,14 +1,15 @@
 #ifndef SORT_H
 #define SORT_H
 
-/* INCLUDED LIBRARIES */
-#include <stdio.h>
-#include <stdlib.h>
+#include <stddef.h>
 
-/* FUNCTION PROTOTYPES */
+
 void print_array(const int *array, size_t size);
+int iParent(int i);
+int iLeftChild(int i);
+void ConvertToHeap(int *array, size_t size);
+void SiftDown(int *array, size_t size, int start, int end);
 void heap_sort(int *array, size_t size);
-void heap_sort_print(int *array, size_t size, int *array_p, size_t size_p);
-void heapify(int *array, size_t size, int i, int *array_p, size_t size_p);
 
-#endif
+
+#endif /* SORT_H */
