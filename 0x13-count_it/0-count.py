@@ -1,59 +1,114 @@
 #!/usr/bin/python3
-"""
-0x13. Count it! - Write a recursive function that queries the Reddit API,
-                  parses the title of all hot articles, and prints a sorted
-                  count of given keywords (case-insensitive, delimited by
-                  spaces.
-                  Javascript should count as javascript, but java should not).
-"""
+""" See README.md for a description of this task """
 
-import requests
-import sys
+from requests import get
 
 
-def count_words(subreddit, word_list, kw_cont={}, next_pg=None, reap_kw={}):
-    """all hot posts by keyword"""
-    headers = {"User-Agent": "nildiert"}
+def count_words(subreddit, word_list):
+    """Counts the number of occurences of a word in word_list in the titles of
+    the hot posts of a subreddit and prints the results.
 
-    if next_pg:
-        subr = requests.get('https://reddit.com/r/' + subreddit +
-                            '/hot.json?after=' + next_pg, headers=headers)
-    else:
-        subr = requests.get('https://reddit.com/r/' + subreddit +
-                            '/hot.json', headers=headers)
+    Args:
+        subreddit (str): subreddit to find posts for
+        word_list (List[str]): words to count
+    """
 
-    if subr.status_code == 404:
-        return
+    def to_word_dict(word_list):
+        """Creates a word count dictionary for words in word_list.
 
-    if kw_cont == {}:
+        Args:
+            word_list (list[str]): words to add to word count dictionary
+
+        Returns:
+            dict[str]: Word dictionary.
+        """
+        word_dict = {}
         for word in word_list:
-            kw_cont[word] = 0
-            reap_kw[word] = word_list.count(word)
+            word = word.lower()
+            if word in word_dict:
+                word_dict[word]['weight'] += 1
+            else:
+                word_dict[word] = {'weight': 1, 'count': 0}
+        return word_dict
 
-    subr_dict = subr.json()
-    subr_data = subr_dict['data']
-    next_pg = subr_data['after']
-    subr_posts = subr_data['children']
+    def request_and_count(url, word_dict, after=None):
+        """Requests Hot posts from a subreddit as JSON data, finds all post
+        titles and counts all occurences of words in word_dict.
 
-    for post in subr_posts:
-        post_data = post['data']
-        post_title = post_data['title']
-        title_words = post_title.split()
-        for w in title_words:
-            for key in kw_cont:
-                if w.lower() == key.lower():
-                    kw_cont[key] += 1
+        Args:
+            url (str): URL to request
+            word_dict (dict[str]): Word dictionary.
+            after (str, optional): request query parameter. 
 
-    if next_pg:
-        count_words(subreddit, word_list, kw_cont, next_pg, reap_kw)
+        Returns:
+            word_dict (dict[str]): Same arg, just updated.
+        """
 
-    else:
-        for key, val in reap_kw.items():
-            if val > 1:
-                kw_cont[key] *= val
+        query = url
+        if after is not None:
+            query += '&after=' + after
 
-        sorted_abc = sorted(kw_cont.items(), key=lambda x: x[0])
-        sorted_res = sorted(sorted_abc, key=lambda x: (-x[1], x[0]))
-        for res in sorted_res:
-            if res[1] > 0:
-                print('{}: {}'.format(res[0], res[1]))
+        response = get(
+            query,
+            allow_redirects=False,
+            headers={'User-agent': ''}
+        )
+
+        if response.status_code != 200:
+            return None
+
+        data = response.json()['data']
+        for post in data['children']:
+            for word in post['data']['title'].lower().split():
+                if word in word_dict:
+                    word_dict[word]['count'] += 1
+
+        if data['after'] is None:
+            return word_dict
+
+        return request_and_count(url, word_dict, data['after'])
+
+    def to_word_count_list(word_dict):
+        """Creates a sorted list of tuples (word, word count) using word_dict
+        as its source.
+
+        Args:
+            word_dict (dict[str]): Word dictionary.
+        Returns:
+            list[tuple[str, int]]: sorted list of tuples (word, count)
+        """
+
+        if word_dict is None:
+            return None
+
+        res = []
+        for word in word_dict:
+            count = word_dict[word]['count'] * word_dict[word]['weight']
+            if count == 0:
+                continue
+            i = 0
+            while i < len(res) and res[i][1] >= count:
+                if res[i][1] == count and res[i][0] > word:
+                    break
+                i += 1
+            res.insert(i, (word, count))
+
+        return res
+
+    def print_words_and_counts(word_count_list):
+        """prints out a list of word counts
+
+        Args:
+            word_count_list (list[tuple[str, int]]): list of (word, count)'s
+        """
+
+        if word_count_list is None:
+            return
+
+        for word, count in word_count_list:
+            print('{}: {}'.format(word, count))
+
+    URL = 'https://www.reddit.com/r/{}/hot/.json?count=1000'.format(subreddit)
+    word_dict = request_and_count(URL, to_word_dict(word_list))
+    word_count_list = to_word_count_list(word_dict)
+    print_words_and_counts(word_count_list)
